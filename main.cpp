@@ -70,12 +70,14 @@ struct atransform{
 
 // "transform": [1.629, 119.9, 1.629, 139.3],
 constexpr atransform transform = {1.629f, 119.9f, 1.629f, 139.3f};
+constexpr bounds map_bounds = {{79.f, -64.5f}, {-66.5f, 67.4f}};
 constexpr rect map_rect = {ImVec2{79.0f, 67.4f}, ImVec2{-66.5f, -64.5f}};
+
 constexpr ImVec2 map_size = ImVec2{141.8f, 131.57f};
 constexpr float coordinate_rotation = 90.f; // degrees
 
 // between boilers constant coordinate 56.20, 6.23
-constexpr ImVec2 boiler_position = ImVec2{9.f, -20.f};
+ImVec2 boiler_position = ImVec2{79.f, -64.5f};
 
 // degrees to radains
 template <typename T>
@@ -105,26 +107,52 @@ ImVec2 RotatePoint(const ImVec2& point, const ImVec2& center, float angleDegrees
     return rotatedPoint + center;
 }
 
+float convert_range(float value, float srcMin, float srcMax, float dstMin, float dstMax) {
+    float normalized = (value - srcMin) / (srcMax - srcMin);
+    return normalized * (dstMax - dstMin) + dstMin;
+}
 
-ImVec2 TransformPoint(const ImVec2& point, int width, int height, float rotationDegrees) {
+ImVec2 normalizeWorldCoord(const ImVec2& worldCoord, const rect& rect) {
+  // using convert_range
+    float x = convert_range(worldCoord.x, rect.top_left.y, rect.bottom_right.y, 0, 1);
+    float y = convert_range(worldCoord.y, rect.top_left.x, rect.bottom_right.x, 0, 1);
+    return ImVec2(x, y);
+}
+
+ImVec2 TransformPoint(const ImVec2& point) {
     // 1. Rotate the point first, taking into account z, x order
-    ImVec2 rotatedPoint = RotatePoint(ImVec2(point.y, point.x), {0,0}, rotationDegrees); 
+    ImVec2 rotatedPoint = RotatePoint(point, ImVec2{0, 0}, coordinate_rotation); 
 
-    // convert from map coordinates to 0,1 space scaled
-    float x = ((rotatedPoint.x - map_rect.bottom_right.x) / map_size.x) * 1.629f;
-    float y = ((rotatedPoint.y - map_rect.bottom_right.y) / map_size.y) * 1.629f;
-
-    printf("Transformed point: %.2f, %.2f\n", x, y);
-
-    // convert from 0,1 to texture space
-    x *= width;
-    y *= height;
-
-    printf("Scaled point: %.2f, %.2f\n", x, y);
-
+    // convert from map coordinates to 0,1 from the top left
+    auto [x, y] = normalizeWorldCoord(point, map_rect);
 
     return ImVec2(x, y);
 }
+
+ImVec2 ConvertToMapCoordinates(float x, float y, float textureWidth, float textureHeight, float scaleFactor) {
+    float scaleX = transform.scale_x;
+    float scaleY = -transform.scale_y; // Notice the inversion here as in your JS code
+    float marginX = transform.offset_x;
+    float marginY = transform.offset_y;
+
+    // Apply transformation
+    float mapX = scaleX * x + marginX;
+    float mapY = scaleY * y + marginY;
+
+    // Rotate coordinates if needed
+    auto [rotatedX, rotatedY] = RotatePoint(ImVec2{mapX, mapY}, ImVec2{0,0}, coordinate_rotation);
+    
+    // Normalize coordinates to [0, 1] based on bounds
+    float normX = (rotatedX - map_bounds.min.x) / (map_bounds.max.x - map_bounds.min.x);
+    float normY = (rotatedY - map_bounds.min.y) / (map_bounds.max.y - map_bounds.min.y);
+
+    // Scale to texture dimensions
+    float texX = normX * textureWidth * scaleFactor;
+    float texY = normY * textureHeight * scaleFactor;
+
+    return ImVec2(texX, texY);
+}
+
 
 
 int main() {
@@ -186,36 +214,46 @@ int main() {
 
         draw_list->AddImage(factory_image.texture_id, ImVec2{0,0} + render_position, image_size + render_position);
 
-        const auto transformed_boiler_position = TransformPoint(boiler_position, factory_image.width, factory_image.height, coordinate_rotation);
-
-        draw_list->AddCircleFilled(transformed_boiler_position + render_position, 5.f, IM_COL32(255, 0, 0, 255));
+        const auto transformed_boiler_position = TransformPoint(boiler_position);
+        const auto position = transformed_boiler_position * image_size;
         draw_list->AddCircleFilled(display_center, 5.f, IM_COL32(255, 255, 0, 255));
+        draw_list->AddCircleFilled(render_position, 5.f, IM_COL32(255, 255, 0, 255));
+        draw_list->AddLine(render_position, render_position + image_size, IM_COL32(255, 255, 255, 255));
 
-
+        draw_list->AddCircleFilled(position + render_position, 5.f, IM_COL32(255, 0, 0, 255));
+       
         char buffer[0x512];
         snprintf(buffer, sizeof(buffer), "Boiler Position: %.2f, %.2f", boiler_position.x, boiler_position.y);
         draw_list->AddText(ImVec2{10, 10}, IM_COL32(255, 255, 255, 255), buffer);
         printf(buffer); printf("\n");
 
-        snprintf(buffer, sizeof(buffer), "Transformed Boiler Position: %.2f, %.2f", transformed_boiler_position.x, transformed_boiler_position.y);
+        snprintf(buffer, sizeof(buffer), "Position Normalized: %.2f, %.2f", transformed_boiler_position.x, transformed_boiler_position.y);
         draw_list->AddText(ImVec2{10, 30}, IM_COL32(255, 255, 255, 255), buffer);
         printf(buffer); printf("\n");
-       
-        snprintf(buffer, sizeof(buffer), "Cursor Pos: %.2f, %.2f", io.MousePos.x, io.MousePos.y);
+
+        const auto delta = io.MousePos - render_position;
+        snprintf(buffer, sizeof(buffer), "Texture Pos: %.2f, %.2f", delta.x, delta.y);
         draw_list->AddText(ImVec2{10, 50}, IM_COL32(255, 255, 255, 255), buffer);
         printf(buffer); printf("\n");
 
-        snprintf(buffer, sizeof(buffer), "Display size: %.2f, %.2f", io.DisplaySize.x, io.DisplaySize.y);
+        const auto pos_normal = normalizeWorldCoord(ImVec2{delta.x, delta.y}, rect{ImVec2{0, 0}, image_size});
+        snprintf(buffer, sizeof(buffer), "Cursor Pos: %.2f, %.2f", pos_normal.x, pos_normal.y);
         draw_list->AddText(ImVec2{10, 70}, IM_COL32(255, 255, 255, 255), buffer);
         printf(buffer); printf("\n");
 
-        snprintf(buffer, sizeof(buffer), "Image size: %.2f, %.2f", image_size.x, image_size.y);
+        snprintf(buffer, sizeof(buffer), "Display size: %.2f, %.2f", io.DisplaySize.x, io.DisplaySize.y);
         draw_list->AddText(ImVec2{10, 90}, IM_COL32(255, 255, 255, 255), buffer);
+        printf(buffer); printf("\n");
+
+        snprintf(buffer, sizeof(buffer), "Image size: %.2f, %.2f", image_size.x, image_size.y);
+        draw_list->AddText(ImVec2{10, 110}, IM_COL32(255, 255, 255, 255), buffer);
         printf(buffer); printf("\n");
 
 
         // Create a simple window
         ImGui::Begin("Settings");
+        ImGui::SliderFloat("Boiler X", &boiler_position.x, map_bounds.min.y, map_bounds.max.y);
+        ImGui::SliderFloat("Boiler Y", &boiler_position.y, map_bounds.min.x, map_bounds.max.x);
 
         ImGui::End();
 
