@@ -1,0 +1,3 @@
+/home/exceptis/source/imgui-testing/build/CMakeFiles/MyImGuiProject.dir
+/home/exceptis/source/imgui-testing/build/CMakeFiles/edit_cache.dir
+/home/exceptis/source/imgui-testing/build/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,6 @@
+{
+    "cmake.configureOnOpen": true,
+    "cmake.generator": "Unix Makefiles",
+    "cmake.cmakePath": "/usr/bin/cmake",
+    "cmake.buildDirectory": "${workspaceFolder}/build"
+  }

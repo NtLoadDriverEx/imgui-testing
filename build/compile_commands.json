@@ -1,0 +1,37 @@
+[
+{
+  "directory": "/home/exceptis/source/imgui-testing/build",
+  "command": "/usr/bin/clang++  -I/home/exceptis/source/imgui-testing/imgui -I/home/exceptis/source/imgui-testing/imgui/backends -g -std=gnu++20 -o CMakeFiles/MyImGuiProject.dir/main.cpp.o -c /home/exceptis/source/imgui-testing/main.cpp",
+  "file": "/home/exceptis/source/imgui-testing/main.cpp"
+},
+{
+  "directory": "/home/exceptis/source/imgui-testing/build",
+  "command": "/usr/bin/clang++  -I/home/exceptis/source/imgui-testing/imgui -I/home/exceptis/source/imgui-testing/imgui/backends -g -std=gnu++20 -o CMakeFiles/MyImGuiProject.dir/imgui/imgui.cpp.o -c /home/exceptis/source/imgui-testing/imgui/imgui.cpp",
+  "file": "/home/exceptis/source/imgui-testing/imgui/imgui.cpp"
+},
+{
+  "directory": "/home/exceptis/source/imgui-testing/build",
+  "command": "/usr/bin/clang++  -I/home/exceptis/source/imgui-testing/imgui -I/home/exceptis/source/imgui-testing/imgui/backends -g -std=gnu++20 -o CMakeFiles/MyImGuiProject.dir/imgui/imgui_draw.cpp.o -c /home/exceptis/source/imgui-testing/imgui/imgui_draw.cpp",
+  "file": "/home/exceptis/source/imgui-testing/imgui/imgui_draw.cpp"
+},
+{
+  "directory": "/home/exceptis/source/imgui-testing/build",
+  "command": "/usr/bin/clang++  -I/home/exceptis/source/imgui-testing/imgui -I/home/exceptis/source/imgui-testing/imgui/backends -g -std=gnu++20 -o CMakeFiles/MyImGuiProject.dir/imgui/imgui_widgets.cpp.o -c /home/exceptis/source/imgui-testing/imgui/imgui_widgets.cpp",
+  "file": "/home/exceptis/source/imgui-testing/imgui/imgui_widgets.cpp"
+},
+{
+  "directory": "/home/exceptis/source/imgui-testing/build",
+  "command": "/usr/bin/clang++  -I/home/exceptis/source/imgui-testing/imgui -I/home/exceptis/source/imgui-testing/imgui/backends -g -std=gnu++20 -o CMakeFiles/MyImGuiProject.dir/imgui/imgui_tables.cpp.o -c /home/exceptis/source/imgui-testing/imgui/imgui_tables.cpp",
+  "file": "/home/exceptis/source/imgui-testing/imgui/imgui_tables.cpp"
+},
+{
+  "directory": "/home/exceptis/source/imgui-testing/build",
+  "command": "/usr/bin/clang++  -I/home/exceptis/source/imgui-testing/imgui -I/home/exceptis/source/imgui-testing/imgui/backends -g -std=gnu++20 -o CMakeFiles/MyImGuiProject.dir/imgui/backends/imgui_impl_glfw.cpp.o -c /home/exceptis/source/imgui-testing/imgui/backends/imgui_impl_glfw.cpp",
+  "file": "/home/exceptis/source/imgui-testing/imgui/backends/imgui_impl_glfw.cpp"
+},
+{
+  "directory": "/home/exceptis/source/imgui-testing/build",
+  "command": "/usr/bin/clang++  -I/home/exceptis/source/imgui-testing/imgui -I/home/exceptis/source/imgui-testing/imgui/backends -g -std=gnu++20 -o CMakeFiles/MyImGuiProject.dir/imgui/backends/imgui_impl_opengl3.cpp.o -c /home/exceptis/source/imgui-testing/imgui/backends/imgui_impl_opengl3.cpp",
+  "file": "/home/exceptis/source/imgui-testing/imgui/backends/imgui_impl_opengl3.cpp"
+}
+]
